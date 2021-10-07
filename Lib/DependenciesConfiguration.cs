@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Lib.Exception;
 
 namespace Lib
 {
@@ -14,13 +15,13 @@ namespace Lib
             Type implementationType = typeof(TImplementation);
 
             if (dependencyType.IsValueType)
-                throw new ArgumentException("Dependency type cannot be value type");
-            if (implementationType.IsAbstract)
-                throw new ArgumentException("Implementation type cannot be abstract");
+                throw new CannotBeValueTypeException("Dependency type cannot be value type");
             if (implementationType.IsInterface)
-                throw new ArgumentException("Implementation type cannot be interface");
+                throw new ImplementationCannotBeInterfaceException("Implementation type cannot be interface");
+            if (implementationType.IsAbstract)
+                throw new ImplementationCannotBeAbstractException("Implementation type cannot be abstract");
             if (!implementationType.IsAssignableTo(dependencyType))
-                throw new ArgumentException("Type " + implementationType + " is not assignable to " + dependencyType);
+                throw new ImplementationIsNotAssignableException("Type " + implementationType + " is not assignable to " + dependencyType);
 
             Dependencies[dependencyType] = implementationType;
         }

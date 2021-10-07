@@ -14,7 +14,12 @@ namespace Lib
 
         public DependencyProvider(DependenciesConfiguration dependencies)
         {
-            Init(dependencies);
+            Init(dependencies, 1);
+        }
+
+        public DependencyProvider(DependenciesConfiguration dependencies, int poolSize)
+        {
+            Init(dependencies, poolSize);
         }
 
         public T Resolve<T>()
@@ -26,9 +31,17 @@ namespace Lib
         {
             CheckCyclingDependency(id, type);
             _currentProducing[id].Push(type);
+            
             if (!_factories.ContainsKey(type))
                 throw new CannotResolveSuchTypeException("Cannot resolve such type: " + type);
-            return _factories[type].Produce(id);
+            
+            object produced = _factories[type].Produce(id);
+            
+            _currentProducing[id].Pop();
+            if (_currentProducing[id].Count == 0)
+                _currentProducing.Remove(id);
+            
+            return produced;
         }
 
         private void CheckCyclingDependency(UniqueId id, Type type)
@@ -54,7 +67,7 @@ namespace Lib
             return _dependencies.ContainsKey(type);
         }
 
-        private void Init(DependenciesConfiguration dependencies)
+        private void Init(DependenciesConfiguration dependencies, int poolSize)
         {
             _dependencies = dependencies.Dependencies.ToDictionary(pair => pair.Key, pair => pair.Value);
             _factories = new Dictionary<Type, DependencyFactory>();
@@ -62,7 +75,7 @@ namespace Lib
             foreach (var key in dependencies.Dependencies.Keys)
             {
                 Type producingType = dependencies.Dependencies[key];
-                _factories[key] = new DependencyFactory(producingType, this);
+                _factories[key] = new DependencyFactory(producingType, this, poolSize);
             }
         }
     }

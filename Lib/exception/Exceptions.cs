@@ -20,4 +20,32 @@
         {
         }
     }
+    
+    public class CannotBeValueTypeException : System.Exception
+    {
+        public CannotBeValueTypeException(string message) : base(message)
+        {
+        }
+    }
+    
+    public class ImplementationCannotBeAbstractException : System.Exception
+    {
+        public ImplementationCannotBeAbstractException(string message) : base(message)
+        {
+        }
+    }
+    
+    public class ImplementationCannotBeInterfaceException : System.Exception
+    {
+        public ImplementationCannotBeInterfaceException(string message) : base(message)
+        {
+        }
+    }
+    
+    public class ImplementationIsNotAssignableException : System.Exception
+    {
+        public ImplementationIsNotAssignableException(string message) : base(message)
+        {
+        }
+    }
 }
